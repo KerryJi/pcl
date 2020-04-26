@@ -2,10 +2,22 @@ name: pcl
 version: 1.9.1
 maintainer: Haoran Wang <haoran.wang@tusimple.ai>
 
+extra_deps:
+  apt: libvtk6-dev libflann1.8 libflann-dev libeigen3-dev libqhull*
+
 build: |
-  [[ -n $CLEANUP ]] && rm -f build
-  mkdir -p build
-  cd build
-  cmake -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE -DBUILD_SHARED_LIBS=ON ..
-  make -j8
-  make install
+
+  cmake_install() {
+    pushd $1
+    [[ -n $CLEANUP ]] && rm -r build
+    mkdir -p build
+    cd build
+    #cmake -DBUILD_GPU=OFF -DWITH_VTK=ON -DCMAKE_INSTALL_PREFIX=$INSTALL_DIR -DCMAKE_BUILD_TYPE=$CMAKE_BUILD_TYPE ..
+    cmake -D CMAKE_BUILD_TYPE=None  -D BUILD_GPU=OFF -DWITH_VTK=ON  -D CMAKE_INSTALL_PREFIX=$INSTALL_DIR  ../
+    make -j8
+    make install
+    cd ..
+    popd
+  }
+  cmake_install .
+  index_zoro_pkg
